@@ -70,7 +70,7 @@ binary_sensor:
   ############################ BASICS
   - platform: status
     name: "Statut"
-switch:
+button:
   ############################ BASICS
   - platform: restart
     name: "Reboot"
@@ -110,8 +110,8 @@ sensor:
                 (to_string(seconds) + "s")
               ).c_str();
     
-  ############################ GAZ
-  # Consommation gaz
+  ############################ METEO
+  # Température
   - platform: custom
     lambda: |-
       auto multiplexed_sht = new MultiplexedShtSensor();
@@ -173,3 +173,30 @@ sensor:
         state_class: "measurement"
         accuracy_decimals: 1
         entity_category: diagnostic
+  # Pluviomètre
+  - platform: pulse_meter
+    pin: 
+      number: GPIO19
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    internal_filter_mode: PULSE
+    id: rain_gauge
+    unit_of_measurement: 'mm/h'
+    name: "Rainfall intensity"
+    icon: 'mdi:weather-rainy'
+    state_class: measurement
+    filters:
+      - multiply: 0.254
+      - multiply: 60
+    timeout: 60min
+    accuracy_decimals: 1
+    total:
+      name: "Rainfall total"
+      icon: 'mdi:weather-rainy'
+      unit_of_measurement: "mm"
+      state_class: total_increasing
+      accuracy_decimals: 1
+      filters:
+        - multiply: 0.254

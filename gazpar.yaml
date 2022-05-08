@@ -55,7 +55,7 @@ binary_sensor:
   ############################ BASICS
   - platform: status
     name: "Statut" 
-switch:
+button:
   ############################ BASICS
   - platform: restart
     name: "Reboot"
