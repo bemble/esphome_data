@@ -9,6 +9,7 @@
 
 #define I2C_SHT 0x44
 
+// TODO: make it more generic, so it can be used with unlimited number of sensors
 float compute_average(float a, float b, float c)
 {
   float diffab = abs(a - b);
@@ -109,30 +110,26 @@ private:
 
   void publish_states()
   {
-    this->temperature_sensor1->publish_state(std::get<0>(this->sht_state[0]));
-    this->humidity_sensor1->publish_state(std::get<1>(this->sht_state[0]));
-    this->temperature_sensor2->publish_state(std::get<0>(this->sht_state[1]));
-    this->humidity_sensor2->publish_state(std::get<1>(this->sht_state[1]));
-    this->temperature_sensor3->publish_state(std::get<0>(this->sht_state[2]));
-    this->humidity_sensor3->publish_state(std::get<1>(this->sht_state[2]));
+    for (int i = 0; i < SHT_COUNT; i++)
+    {
+      this->raw_temperature_sensors[i]->publish_state(std::get<0>(this->sht_state[i]));
+      this->raw_humidity_sensors[i]->publish_state(std::get<1>(this->sht_state[i]));
+    }
 
     this->temperature_sensor->publish_state(this->get_average_temperature());
     this->humidity_sensor->publish_state(this->get_average_humidity());
   }
 public:
-  Sensor *temperature_sensor1 = new Sensor();
-  Sensor *humidity_sensor1 = new Sensor();
-  Sensor *temperature_sensor2 = new Sensor();
-  Sensor *humidity_sensor2 = new Sensor();
-  Sensor *temperature_sensor3 = new Sensor();
-  Sensor *humidity_sensor3 = new Sensor();
+  // TODO: find a way to iterate with SHT_COUNT instead of hard add 3 sensors
+  Sensor *raw_temperature_sensors[SHT_COUNT] = {new Sensor(), new Sensor(), new Sensor()};
+  Sensor *raw_humidity_sensors[SHT_COUNT] = {new Sensor(), new Sensor(), new Sensor()};
 
   Sensor *temperature_sensor = new Sensor();
   Sensor *humidity_sensor = new Sensor();
 
-  MultiplexedShtSensor() : PollingComponent(5 * 60 * 1000) {}
+  MultiplexedShtSensor() : PollingComponent(60 * 1000) {}
 
-  float get_setup_priority() const override { return esphome::setup_priority::HARDWARE; }
+  float get_setup_priority() const override { return esphome::setup_priority::BUS; }
 
   void setup() override
   {

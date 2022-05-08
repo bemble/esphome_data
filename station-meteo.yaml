@@ -119,12 +119,12 @@ sensor:
       return { 
         multiplexed_sht->temperature_sensor, 
         multiplexed_sht->humidity_sensor,
-        multiplexed_sht->temperature_sensor1, 
-        multiplexed_sht->humidity_sensor1,
-        multiplexed_sht->temperature_sensor2, 
-        multiplexed_sht->humidity_sensor2,
-        multiplexed_sht->temperature_sensor3, 
-        multiplexed_sht->humidity_sensor3
+        multiplexed_sht->raw_temperature_sensors[0],
+        multiplexed_sht->raw_humidity_sensors[0],
+        multiplexed_sht->raw_temperature_sensors[1],
+        multiplexed_sht->raw_humidity_sensors[1], 
+        multiplexed_sht->raw_temperature_sensors[2],
+        multiplexed_sht->raw_humidity_sensors[2]
       };
     sensors:
       - name: "Temperature"
