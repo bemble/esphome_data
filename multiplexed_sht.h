@@ -2,6 +2,8 @@
 #include "ClosedCube_SHT31D.h"
 #include "PCF8574.h"
 
+#define TAG "multi_sht"
+
 #define SHT_COUNT 3
 #define U1 2
 #define U2 1
@@ -9,23 +11,54 @@
 
 #define I2C_SHT 0x44
 
-// TODO: make it more generic, so it can be used with unlimited number of sensors
-float compute_average(float a, float b, float c)
+float get_sum(float data[])
 {
-  float diffab = abs(a - b);
-  float diffac = abs(a - c);
-  float diffbc = abs(b - c);
-
-  if (diffab <= diffac && diffab <= diffbc)
+  float sum = 0.0;
+  for(int i = 0; i < SHT_COUNT; ++i)
   {
-    return (a + b) / 2;
+    sum += data[i];
   }
-  else if (diffac <= diffab && diffac <= diffbc)
+  return sum;
+}
+
+float get_mean(float data[])
+{
+  return get_sum(data) / SHT_COUNT;
+}
+
+float get_standard_deviation(float data[])
+{
+  float mean = get_mean(data);
+  float standard_deviation = .0;
+
+  for(int i = 0; i < SHT_COUNT; ++i)
   {
-    return (a + c) / 2;
+    standard_deviation += pow(data[i] - mean, 2);
   }
 
-  return (b + c) / 2;
+  return sqrt(standard_deviation / SHT_COUNT);
+}
+
+/**
+ * Compute average of given array.
+ * If the deviation of the value is too high, the value will be removed
+ */
+float average(float data[])
+{
+  float sum = get_sum(data);
+  float mean = get_mean(data);
+  float std_dev = get_standard_deviation(data);
+
+  int removed_count = 0;
+  for(int i = 0; i < SHT_COUNT; ++i)
+  {
+    if(abs(data[i] - mean) > std_dev * 2)
+    {
+      sum -= data[i];
+      removed_count ++;
+    }
+  }
+  return sum / (SHT_COUNT - removed_count);
 }
 
 class MultiplexedShtSensor : public PollingComponent, public Sensor
@@ -94,18 +127,28 @@ private:
     else
     {
       this->sht_state[this->current_sht_idx] = std::make_tuple(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
-      ESP_LOGW("multi_sht.read", "SHT31D error for sensor %d: %d", this->current_sht_idx + 1, sensor.error);
+      ESP_LOGW(TAG, "SHT31D error for sensor %d: %d", this->current_sht_idx + 1, sensor.error);
     }
   }
 
   float get_average_temperature()
   {
-    return compute_average(std::get<0>(this->sht_state[0]), std::get<0>(this->sht_state[1]), std::get<0>(this->sht_state[2]));
+    float data[SHT_COUNT];
+    for(int i = 0; i < SHT_COUNT; ++i)
+    {
+      data[i] = std::get<0>(this->sht_state[i]);
+    }
+    return average(data);
   }
 
   float get_average_humidity()
   {
-    return compute_average(std::get<1>(this->sht_state[0]), std::get<1>(this->sht_state[1]), std::get<1>(this->sht_state[2]));
+    float data[SHT_COUNT];
+    for(int i = 0; i < SHT_COUNT; ++i)
+    {
+      data[i] = std::get<1>(this->sht_state[i]);
+    }
+    return average(data);
   }
 
   void publish_states()
@@ -141,12 +184,12 @@ public:
   {
     if (!this->expander_inited)
     {
-      ESP_LOGE("multi_sht.init", "Could not init PCF extender");
+      ESP_LOGE(TAG, "Could not init PCF extender");
     }
 
     if (!this->sht_inited)
     {
-      ESP_LOGE("multi_sht.init", "Could not init SHT");
+      ESP_LOGE(TAG, "Could not init SHT");
     }
 
     if (!(this->expander_inited && this->sht_inited))
