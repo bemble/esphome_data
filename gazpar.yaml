@@ -1,0 +1,128 @@
+esphome:
+  name: gazpar
+
+esp8266:
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret home_assistant_password
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 10.0.3.1
+    gateway: 10.0.0.1
+    subnet: 255.255.0.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Gazpar Fallback Hotspot"
+    password: !secret ap_password
+    
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: Europe/Paris
+#    on_time:
+#      - seconds: 57
+#        minutes: 59
+#        hours: 23
+#        then:
+#          - pulse_meter.set_total_pulses:
+#              id: gazpar
+#              value: 0  
+
+captive_portal:
+
+###############################################################################
+# SENSORS
+text_sensor:
+  ############################ BASICS
+  - platform: template
+    name: Uptime
+    id: uptime_human
+    icon: mdi:clock-start
+      
+binary_sensor:
+  ############################ BASICS
+  - platform: status
+    name: "Statut" 
+switch:
+  ############################ BASICS
+  - platform: restart
+    name: "Reboot"
+sensor:
+  ############################ BASICS
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    unit_of_measurement: dB
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:wifi
+  - platform: uptime
+    id: uptime_seconds
+    name: "Uptime"
+    update_interval: 60s
+    unit_of_measurement: s
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:timer
+    on_raw_value:
+      then:
+        - text_sensor.template.publish:
+            id: uptime_human
+            state: !lambda |-
+              int seconds = round(id(uptime_seconds).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              return (
+                (days ? to_string(days) + "d " : "") +
+                (hours ? to_string(hours) + "h " : "") +
+                (minutes ? to_string(minutes) + "m " : "") +
+                (to_string(seconds) + "s")
+              ).c_str();
+    
+  ############################ GAZ
+  # Consommation gaz
+  - platform: pulse_meter
+    id: gazpar
+    pin:
+      number: GPIO2
+    unit_of_measurement: "l/mn"
+    icon: mdi:fire
+    internal_filter: 100ms
+    name: "Débit Gaz"
+    state_class: measurement
+    filters:
+      - multiply: 10
+    total:
+      unit_of_measurement: "m³"
+      name: 'Volume Gaz'
+      filters:
+        - multiply: 0.01
+      accuracy_decimals: 3
+      icon: mdi:fire
+      id: gazpar_gaz_m3
+      device_class: "gas"
+  - platform: template
+    name: "Puissance Gaz"
+    lambda: |-
+      return id(gazpar_gaz_m3).state * 10.01;
+    device_class: energy
+    unit_of_measurement: "kWh"
+    accuracy_decimals: 3 
+    id: gazpar_puissance_gaz
+    state_class: total_increasing

@@ -1,0 +1,175 @@
+esphome:
+  name: station-meteo
+  includes:
+    - multiplexed_sht.h
+  libraries:
+    - "Wire"
+    - "closedcube/ClosedCube SHT31D"
+    - "robtillaart/PCF8574"
+
+esp32:
+  board: az-delivery-devkit-v4
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  
+# Enable Home Assistant API
+api:
+  password: !secret home_assistant_password
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: 10.0.3.2
+    gateway: 10.0.0.1
+    subnet: 255.255.0.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Meteo Fallback Hotspot"
+    password: !secret ap_password
+    
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: Europe/Paris
+#    on_time:
+#      - seconds: 57
+#        minutes: 59
+#        hours: 23
+#        then:
+#          - pulse_meter.set_total_pulses:
+#              id: gazpar
+#              value: 0  
+
+captive_portal:
+
+i2c:
+  - id: i2c0
+    sda: GPIO21
+    scl: GPIO22
+    scan: True
+
+###############################################################################
+# SENSORS
+text_sensor:
+  ############################ BASICS
+  - platform: template
+    name: Uptime
+    id: uptime_human
+    icon: mdi:clock-start
+    entity_category: diagnostic
+      
+binary_sensor:
+  ############################ BASICS
+  - platform: status
+    name: "Statut"
+switch:
+  ############################ BASICS
+  - platform: restart
+    name: "Reboot"
+sensor:
+  ############################ BASICS
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    unit_of_measurement: dB
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:wifi
+  - platform: uptime
+    id: uptime_seconds
+    name: "Uptime"
+    update_interval: 60s
+    unit_of_measurement: s
+    accuracy_decimals: 0
+    force_update: false
+    icon: mdi:timer
+    on_raw_value:
+      then:
+        - text_sensor.template.publish:
+            id: uptime_human
+            state: !lambda |-
+              int seconds = round(id(uptime_seconds).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              return (
+                (days ? to_string(days) + "d " : "") +
+                (hours ? to_string(hours) + "h " : "") +
+                (minutes ? to_string(minutes) + "m " : "") +
+                (to_string(seconds) + "s")
+              ).c_str();
+    
+  ############################ GAZ
+  # Consommation gaz
+  - platform: custom
+    lambda: |-
+      auto multiplexed_sht = new MultiplexedShtSensor();
+      App.register_component(multiplexed_sht);
+      return { 
+        multiplexed_sht->temperature_sensor, 
+        multiplexed_sht->humidity_sensor,
+        multiplexed_sht->temperature_sensor1, 
+        multiplexed_sht->humidity_sensor1,
+        multiplexed_sht->temperature_sensor2, 
+        multiplexed_sht->humidity_sensor2,
+        multiplexed_sht->temperature_sensor3, 
+        multiplexed_sht->humidity_sensor3
+      };
+    sensors:
+      - name: "Temperature"
+        unit_of_measurement: "°C"
+        device_class: "temperature"
+        state_class: "measurement"
+        accuracy_decimals: 1
+      - name: "Humidity"
+        unit_of_measurement: "%"
+        device_class: "humidity"
+        state_class: "measurement"
+        accuracy_decimals: 1
+      - name: "Temperature 1"
+        unit_of_measurement: "°C"
+        device_class: "temperature"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
+      - name: "Humidity 1"
+        unit_of_measurement: "%"
+        device_class: "humidity"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
+      - name: "Temperature 2"
+        unit_of_measurement: "°C"
+        device_class: "temperature"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
+      - name: "Humidity 2"
+        unit_of_measurement: "%"
+        device_class: "humidity"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
+      - name: "Temperature 3"
+        unit_of_measurement: "°C"
+        device_class: "temperature"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
+      - name: "Humidity 3"
+        unit_of_measurement: "%"
+        device_class: "humidity"
+        state_class: "measurement"
+        accuracy_decimals: 1
+        entity_category: diagnostic
