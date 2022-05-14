@@ -2,12 +2,12 @@
 #include "ClosedCube_SHT31D.h"
 #include "PCF8574.h"
 
-#define TAG "multi_sht"
+#define MSHT_TAG "multi_sht"
 
 #define SHT_COUNT 3
-#define U1 2
-#define U2 1
-#define U3 3
+#define MSHT_U1 2
+#define MSHT_U2 1
+#define MSHT_U3 3
 
 #define I2C_SHT 0x44
 
@@ -78,9 +78,9 @@ private:
     this->expander_inited = this->expander.begin();
     if (this->expander_inited)
     {
-      this->sht_pcf_pins[0] = U1;
-      this->sht_pcf_pins[1] = U2;
-      this->sht_pcf_pins[2] = U3;
+      this->sht_pcf_pins[0] = MSHT_U1;
+      this->sht_pcf_pins[1] = MSHT_U2;
+      this->sht_pcf_pins[2] = MSHT_U3;
       this->current_sht_idx = 0;
 
       for (int i = 0; i < SHT_COUNT; i++)
@@ -127,7 +127,7 @@ private:
     else
     {
       this->sht_state[this->current_sht_idx] = std::make_tuple(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
-      ESP_LOGW(TAG, "SHT31D error for sensor %d: %d", this->current_sht_idx + 1, sensor.error);
+      ESP_LOGW(MSHT_TAG, "SHT31D error for sensor %d: %d", this->current_sht_idx + 1, sensor.error);
     }
   }
 
@@ -184,12 +184,12 @@ public:
   {
     if (!this->expander_inited)
     {
-      ESP_LOGE(TAG, "Could not init PCF extender");
+      ESP_LOGE(MSHT_TAG, "Could not init PCF extender");
     }
 
     if (!this->sht_inited)
     {
-      ESP_LOGE(TAG, "Could not init SHT");
+      ESP_LOGE(MSHT_TAG, "Could not init SHT");
     }
 
     if (!(this->expander_inited && this->sht_inited))

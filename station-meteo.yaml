@@ -2,6 +2,7 @@ esphome:
   name: station-meteo
   includes:
     - multiplexed_sht.h
+    - davis_wind.h
   libraries:
     - "Wire"
     - "closedcube/ClosedCube SHT31D"
@@ -65,6 +66,18 @@ text_sensor:
     id: uptime_human
     icon: mdi:clock-start
     entity_category: diagnostic
+
+  # Vent
+  - platform: custom
+    lambda: |-
+      auto davis_wind = new DavisWindSensor();
+      App.register_component(davis_wind);
+      return { 
+        davis_wind->heading_sensor
+      };
+    text_sensors:
+      - name: "Wind direction"
+        icon: mdi:compass-outline
       
 binary_sensor:
   ############################ BASICS
@@ -200,3 +213,20 @@ sensor:
       accuracy_decimals: 1
       filters:
         - multiply: 0.254
+  # Vent
+  - platform: custom
+    lambda: |-
+      auto davis_wind = new DavisWindSensor();
+      App.register_component(davis_wind);
+      return {
+        davis_wind->vane_value_sensor,
+        davis_wind->direction_in_degrees
+      };
+    sensors:
+      - name: "Wind vane value"
+        icon: mdi:tape-measure
+        entity_category: diagnostic
+      - name: "Wind vane angle"
+        unit_of_measurement: '°'
+        icon: mdi:angle-acute
+        entity_category: diagnostic
