@@ -51,7 +51,6 @@ private:
 public:
   Sensor *vane_value_sensor = new Sensor();
   Sensor *direction_in_degrees = new Sensor();
-  // Todo: find a way to have both sensor and textsensor without duplicating custom entity
   TextSensor *heading_sensor = new TextSensor();
 
   DavisWindSensor() : PollingComponent(500) {}
@@ -65,7 +64,9 @@ public:
   void update() override
   {
     this->read_direction();
-    if (abs(this->degrees_direction - previous_direction) > (DWIND_DIRECTION_PRECISION == 8) ? 10 : 5)
+    int position_difference = abs(this->degrees_direction - this->previous_direction);
+    int max_diff = (DWIND_DIRECTION_PRECISION == 8) ? 10 : 5;
+    if (position_difference > max_diff)
     {
       this->publish_states();
       this->previous_direction = this->degrees_direction;

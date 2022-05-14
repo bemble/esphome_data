@@ -68,6 +68,7 @@ text_sensor:
     entity_category: diagnostic
 
   # Vent
+  # TODO: how to have text_sensor and sensor without duplicating the platform?
   - platform: custom
     lambda: |-
       auto davis_wind = new DavisWindSensor();
