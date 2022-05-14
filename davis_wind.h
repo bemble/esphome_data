@@ -10,6 +10,14 @@
 // 16, direction can be: "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
 #define DWIND_DIRECTION_PRECISION 8
 
+/**
+ * Handle Davis Instruments Vantage Pro anemometer and vane.
+ * Wiring:
+ *  - yellow: +5v
+ *  - red: GND
+ *  - green: vane
+ *  - black: anemometer (pulled up with a 47K resistor)
+ */
 class DavisWindSensor : public PollingComponent, public Sensor
 {
 private:
