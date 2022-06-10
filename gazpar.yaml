@@ -1,8 +1,8 @@
 esphome:
   name: gazpar
 
-esp8266:
-  board: esp01_1m
+esp32:
+  board: az-delivery-devkit-v4
 
 # Enable logging
 logger:
@@ -26,31 +26,11 @@ wifi:
   ap:
     ssid: "Gazpar Fallback Hotspot"
     password: !secret ap_password
-    
-time:
-  - platform: homeassistant
-    id: homeassistant_time
-    timezone: Europe/Paris
-#    on_time:
-#      - seconds: 57
-#        minutes: 59
-#        hours: 23
-#        then:
-#          - pulse_meter.set_total_pulses:
-#              id: gazpar
-#              value: 0  
 
 captive_portal:
 
 ###############################################################################
 # SENSORS
-text_sensor:
-  ############################ BASICS
-  - platform: template
-    name: Uptime
-    id: uptime_human
-    icon: mdi:clock-start
-      
 binary_sensor:
   ############################ BASICS
   - platform: status
@@ -75,35 +55,18 @@ sensor:
     unit_of_measurement: s
     accuracy_decimals: 0
     force_update: false
-    icon: mdi:timer
-    on_raw_value:
-      then:
-        - text_sensor.template.publish:
-            id: uptime_human
-            state: !lambda |-
-              int seconds = round(id(uptime_seconds).raw_state);
-              int days = seconds / (24 * 3600);
-              seconds = seconds % (24 * 3600);
-              int hours = seconds / 3600;
-              seconds = seconds % 3600;
-              int minutes = seconds /  60;
-              seconds = seconds % 60;
-              return (
-                (days ? to_string(days) + "d " : "") +
-                (hours ? to_string(hours) + "h " : "") +
-                (minutes ? to_string(minutes) + "m " : "") +
-                (to_string(seconds) + "s")
-              ).c_str();
-    
+    icon: mdi:clock-start
+ 
   ############################ GAZ
   # Consommation gaz
   - platform: pulse_meter
     id: gazpar
     pin:
-      number: GPIO2
+      number: GPIO23
     unit_of_measurement: "l/mn"
     icon: mdi:fire
-    internal_filter: 100ms
+    internal_filter_mode: PULSE
+    internal_filter: 150ms
     name: "Débit Gaz"
     state_class: measurement
     filters:
@@ -113,10 +76,15 @@ sensor:
       name: 'Volume Gaz'
       filters:
         - multiply: 0.01
-      accuracy_decimals: 3
+      accuracy_decimals: 2
       icon: mdi:fire
       id: gazpar_gaz_m3
       device_class: "gas"
+      on_value:
+        - homeassistant.service:
+            service: input_number.increment
+            data:
+              entity_id: input_number.energy_index_gaz
   - platform: template
     name: "Puissance Gaz"
     lambda: |-
@@ -126,3 +94,13 @@ sensor:
     accuracy_decimals: 3 
     id: gazpar_puissance_gaz
     state_class: total_increasing
+  - platform: homeassistant
+    name: "Index compteur"
+    id: index_compteur
+    entity_id: input_number.energy_index_gaz
+    internal: no
+    entity_category: diagnostic
+    icon: mdi:counter
+    unit_of_measurement: "m³"
+    accuracy_decimals: 2
+    
