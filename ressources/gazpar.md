@@ -32,3 +32,4 @@ Le schéma et le PCB sont dispo dans le dossier [gazpar-kicad](./gazpar-kicad).
 
 - [Gazpar/Espeasy](https://community.jeedom.com/t/tuto-module-gazpar-pour-espeasy/46489)
 - [Récupération Gazpar dans Home Assistant](https://forum.hacf.fr/t/recuperation-telesignalisation-gazpar/5930)
+- [Fichiers KiCad pour l'ESP32 Dev Kit C](https://www.snapeda.com/parts/ESP32-DEVKITC-32D/Espressif%20Systems/view-part)
