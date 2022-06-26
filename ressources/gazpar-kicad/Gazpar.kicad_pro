@@ -49,7 +49,16 @@
         }
       },
       "diff_pair_dimensions": [],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "courtyards_overlap|159085001|81575001|5430ab11-d688-4c25-ac5f-9a083431a45a|69759c79-48b3-4cbc-bf22-88d4eff193c1",
+        "courtyards_overlap|161400001|50590001|5430ab11-d688-4c25-ac5f-9a083431a45a|ca26901c-11f0-48e3-bca9-1c204b71fdb3",
+        "courtyards_overlap|165342970|69310001|5430ab11-d688-4c25-ac5f-9a083431a45a|495bcaba-89cc-47f4-984d-a4b3f24a8642",
+        "courtyards_overlap|171687705|81575001|5430ab11-d688-4c25-ac5f-9a083431a45a|f0c563cd-8e2a-406d-8f5f-d03b0ad2a93a",
+        "via_dangling|147955000|41275000|f241e0ee-d3d0-4acb-927b-10754037fbc9|00000000-0000-0000-0000-000000000000",
+        "via_dangling|147955000|96520000|c834efbe-45e0-42bb-931e-de0f2ded443b|00000000-0000-0000-0000-000000000000",
+        "via_dangling|188595000|41275000|539dec9e-2c45-4201-ab13-cbbbab8fc31b|00000000-0000-0000-0000-000000000000",
+        "via_dangling|188595000|96520000|552d2777-af2b-41ec-a31e-cd43b7c8490e|00000000-0000-0000-0000-000000000000"
+      ],
       "meta": {
         "version": 2
       },
@@ -392,6 +401,15 @@
       "version": 1
     },
     "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "fix_passive_vals": false,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 0,
+      "workbook_filename": ""
+    },
     "page_layout_descr_file": "",
     "plot_directory": "",
     "spice_adjust_passive_values": false,

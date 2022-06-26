@@ -14,12 +14,10 @@ A défaut, je pense qu'il faut un autre montage, moins énergivore (à base d'at
 
 Pour le PCB fourni :
 
-- Alimentation 5V
 - U1 : Opto PC817 (ou EL817)
-- U2 : [ESP-01S](https://www.amazon.fr/AZDelivery-ESP8266-Arduino-Raspberry-microcontr%C3%B4leur/dp/B01LK83TX0)
-- U3 : [Module réducteur de tension](https://www.amazon.fr/gp/product/B07MY2NMQ6) basé sur un AMS1117 (l'ESP-01 fonctionne sur du 3.3V)
-- R1 : résistance 330 ohm 1/4W
-- R2 : résistance 1K ohm 1/4W
+- U2 : [ESP32 Dev Kit C](https://www.amazon.fr/dp/B071P98VTG)
+- R1 : résistance 330Ω 1/4W
+- R2 : résistance 1KΩ 1/4W
 - D1 : diode de redressement 1N4148
 - Une led (débug, s'allumera à chaque pulse)
 - [Cable JAE Gazpar](https://www.gce-electronics.com/fr/divers/1612-connecteur-jae-pour-compteur-gazpar.html)

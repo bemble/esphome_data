@@ -1,5 +1,5 @@
 esphome:
-  name: gazpar
+  name: "gazpar"
 
 esp32:
   board: az-delivery-devkit-v4
