@@ -1,63 +1,15 @@
-esphome:
-  name: "gazpar"
+substitutions:
+  name: gazpar
+  static_ip: !secret ip_gazpar
 
+packages:
+  wifi: !include common/wifi.yaml
+  device_base: !include common/device_base.yaml
+  
 esp32:
   board: az-delivery-devkit-v4
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  password: !secret home_assistant_password
-
-ota:
-  password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  manual_ip:
-    static_ip: 10.0.3.1
-    gateway: 10.0.0.1
-    subnet: 255.255.0.0
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Gazpar Fallback Hotspot"
-    password: !secret ap_password
-
-captive_portal:
-
-###############################################################################
-# SENSORS
-binary_sensor:
-  ############################ BASICS
-  - platform: status
-    name: "Statut" 
-button:
-  ############################ BASICS
-  - platform: restart
-    name: "Reboot"
+  
 sensor:
-  ############################ BASICS
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    update_interval: 60s
-    unit_of_measurement: dB
-    accuracy_decimals: 0
-    force_update: false
-    icon: mdi:wifi
-  - platform: uptime
-    id: uptime_seconds
-    name: "Uptime"
-    update_interval: 60s
-    unit_of_measurement: s
-    accuracy_decimals: 0
-    force_update: false
-    icon: mdi:clock-start
- 
-  ############################ GAZ
   # Consommation gaz
   - platform: pulse_meter
     id: gazpar
@@ -96,11 +48,11 @@ sensor:
     state_class: total_increasing
   - platform: homeassistant
     name: "Index compteur"
-    id: index_compteur
+    id: energy_index_gaz
     entity_id: input_number.energy_index_gaz
     internal: no
     entity_category: diagnostic
     icon: mdi:counter
     unit_of_measurement: "m³"
     accuracy_decimals: 2
-    
+      

@@ -1,0 +1,22 @@
+esphome:
+  name: ${name}
+
+# Enable logging
+logger:
+  level: WARN
+
+# Enable Home Assistant API
+api:
+  password: !secret home_assistant_password
+
+ota:
+  password: !secret ota_password
+
+captive_portal:
+
+binary_sensor:
+  - <<: !include sensors/status.config.yaml
+button:
+  - <<: !include sensors/reboot.config.yaml
+sensor:
+  - <<: !include sensors/uptime.config.yaml

@@ -2,6 +2,8 @@
 
 > Remonter la consommation de gaz sur Home Assistant via ESPHome.
 
+![PCB gazpar](./gazpar_pcb.jpg)
+
 ## Mise en garde
 
 J'ai préféré, par sécurité, déporter l'installation électronique de mon compteur de gaz. J'ai utilisé un cable de 10m allant du compteur Gazpar jusqu'à mon garage où j'y ai installé l'ESP et le circuit.

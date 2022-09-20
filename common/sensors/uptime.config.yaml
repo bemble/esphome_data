@@ -1,0 +1,8 @@
+platform: uptime
+id: uptime_seconds
+name: "Uptime"
+update_interval: 60s
+unit_of_measurement: s
+accuracy_decimals: 0
+force_update: false
+icon: mdi:clock-start

@@ -1,0 +1,49 @@
+substitutions:
+  name: garage-door
+  static_ip: !secret ip_garage_door
+
+packages:
+  wifi: !include common/wifi.yaml
+  device_base: !include common/device_base.yaml
+  
+esp32:
+  board: az-delivery-devkit-v4
+
+binary_sensor:
+  - platform: gpio
+    name: Porte Garage Rue Fermée
+    id: garage_door_sensor
+    pin:
+      number: 14
+      inverted: False
+    device_class: garage_door
+button:
+  - platform: template
+    name: Commande Porte Garage Rue
+    id: remote_command_button
+    icon: mdi:remote
+    on_press:
+      - switch.turn_on: garage_door_relay
+      - delay: 200ms
+      - switch.turn_off: garage_door_relay
+switch:
+  - platform: gpio
+    internal: true
+    pin: 12
+    id: garage_door_relay
+cover:
+  - platform: template
+    name: "Porte Garage Rue"
+    device_class: garage
+    lambda: |-
+      if (id(garage_door_sensor).state) {
+        return COVER_OPEN;
+      } else {
+        return COVER_CLOSED;
+      }
+    open_action:
+      - button.press: remote_command_button
+    close_action:
+      - button.press: remote_command_button
+    stop_action:
+      - button.press: remote_command_button
