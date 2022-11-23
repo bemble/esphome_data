@@ -9,37 +9,5 @@ packages:
 esp32:
   board: az-delivery-devkit-v4
 
-esp32_ble_tracker:
-  on_ble_advertise:
-    - then:
-        - lambda: |-
-            bool is_tile = false;
-            
-            for (auto uuid : x.get_service_uuids()) {
-                if (strcmp(uuid.to_string().c_str(), "0xFEED") == 0) {
-                  ESP_LOGD("ble_adv", "New BLE device");
-                  ESP_LOGD("ble_adv", "  address: %s", x.address_str().c_str());
-                  ESP_LOGD("ble_adv", "  name: %s", x.get_name().c_str());
-                  ESP_LOGD("ble_adv", "  Advertised service UUIDs:");
-                  ESP_LOGD("ble_adv", "    - %s", uuid.to_string().c_str());
-                  ESP_LOGD("ble_adv", "  Advertised service data:");
-                  for (auto data : x.get_service_datas()) {
-                      ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
-                  }
-                  ESP_LOGD("ble_adv", "  Advertised manufacturer data:");
-                  for (auto data : x.get_manufacturer_datas()) {
-                      ESP_LOGD("ble_adv", "    - %s: (length %i)", data.uuid.to_string().c_str(), data.data.size());
-                  }
-                  break;
-                }
-            }
-          
-binary_sensor:
-  - platform: ble_presence
-    mac_address: !secret beacon_address_garbage_recycling
-    id: garbage_recycling_presence
-    name: "Présence poubelle recyclage"
-  - platform: ble_presence
-    mac_address: !secret beacon_address_garbage
-    id: garbage_presence
-    name: "Présence poubelle ordures ménagères"
+bluetooth_proxy:
+  active: true

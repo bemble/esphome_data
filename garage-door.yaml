@@ -9,6 +9,8 @@ packages:
 esp32:
   board: az-delivery-devkit-v4
 
+bluetooth_proxy:
+
 binary_sensor:
   - platform: gpio
     name: Porte Garage Rue Fermée

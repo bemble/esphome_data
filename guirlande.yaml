@@ -1,0 +1,28 @@
+substitutions:
+  name: guirlandes
+  static_ip: !secret ip_guirlandes
+
+packages:
+  wifi: !include common/wifi.yaml
+  device_base: !include common/device_base.yaml
+  
+esp32:
+  board: esp32dev
+
+bluetooth_proxy:
+
+light:
+  - platform: binary
+    name: "Guirlande 1"
+    output: light1_output
+  - platform: binary
+    name: "Guirlande 2"
+    output: light2_output
+
+output:
+  - id: light1_output
+    platform: gpio
+    pin: GPIO16
+  - id: light2_output
+    platform: gpio
+    pin: GPIO17

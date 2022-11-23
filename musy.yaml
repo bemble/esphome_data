@@ -1,0 +1,107 @@
+substitutions:
+  name: musy
+  static_ip: !secret ip_musy
+  friendly_name: "Muse Luxe"
+
+packages:
+  wifi: !include common/wifi.yaml
+  device_base: !include common/device_base.yaml
+
+esphome:
+  name_add_mac_suffix: true
+  project:
+    name: raspiaudio.muse-luxe
+    version: "1.0"
+
+esp32:
+  board: esp-wrover-kit
+  framework:
+    type: arduino
+
+i2c:
+  sda: GPIO18
+  scl: GPIO23
+
+dashboard_import:
+  package_import_url: github://esphome/media-players/raspiaudio-muse-luxe.yaml@main
+
+improv_serial:
+
+external_components:
+  - source: github://pr#3552
+    components: [es8388]
+    refresh: 0s
+
+media_player:
+  - platform: i2s_audio
+    id: muse_media_player
+    name: ${friendly_name}
+    dac_type: external
+    i2s_lrclk_pin: GPIO25
+    i2s_dout_pin: GPIO26
+    i2s_bclk_pin: GPIO5
+    mode: stereo
+    mute_pin:
+      number: GPIO21
+      inverted: true
+
+es8388:
+
+sensor:
+ - platform: adc
+   pin: GPIO33
+   name: ${name} Battery
+   icon: "mdi:battery-outline"
+   device_class: voltage
+   state_class: measurement
+   unit_of_measurement: V
+   update_interval: 15s
+   accuracy_decimals: 3
+   attenuation: 11db
+   raw: true
+   filters:
+    - multiply: 0.00173913 # 2300 -> 4, for attenuation 11db, based on Olivier's code
+    - exponential_moving_average:
+        alpha: 0.2
+        send_every: 2
+    - delta: 0.002
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO19
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: ${friendly_name} Volume Up
+    on_click:
+      - media_player.volume_up:
+  - platform: gpio
+    pin:
+      number: GPIO32
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: ${friendly_name} Volume Down
+    on_click:
+      - media_player.volume_down:
+  - platform: gpio
+    pin:
+      number: GPIO12
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: ${friendly_name} Play Button
+    on_click:
+      - media_player.toggle:
+
+light:
+  - platform: fastled_clockless
+    name: ${friendly_name}
+    pin: GPIO22
+    chipset: SK6812
+    num_leds: 1
+    rgb_order: grb
