@@ -9,10 +9,8 @@ packages:
 esp32:
   board: esp32dev
 
-bluetooth_proxy:
-
 light:
-  - platform: binary
+  - platform: monochromatic
     name: "Guirlande 1"
     output: light1_output
   - platform: binary
@@ -21,8 +19,8 @@ light:
 
 output:
   - id: light1_output
-    platform: gpio
+    platform: ledc
     pin: GPIO16
   - id: light2_output
-    platform: gpio
+    platform: ledc
     pin: GPIO17

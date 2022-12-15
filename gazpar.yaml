@@ -8,8 +8,6 @@ packages:
   
 esp32:
   board: az-delivery-devkit-v4
-
-bluetooth_proxy:
   
 sensor:
   # Consommation gaz
@@ -39,15 +37,6 @@ sensor:
             service: input_number.increment
             data:
               entity_id: input_number.energy_index_gaz
-  - platform: template
-    name: "Puissance Gaz"
-    lambda: |-
-      return id(gazpar_gaz_m3).state * 10.01;
-    device_class: energy
-    unit_of_measurement: "kWh"
-    accuracy_decimals: 3 
-    id: gazpar_puissance_gaz
-    state_class: total_increasing
   - platform: homeassistant
     name: "Index compteur"
     id: energy_index_gaz
